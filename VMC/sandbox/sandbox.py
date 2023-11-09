@@ -21,7 +21,7 @@ class Sandbox(MQTTModule):
 
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
         if payload is None or not payload.tags:
-            continue
+            return
 
         for tag in payload.tags:
             if tag is None or tag.id is None:
