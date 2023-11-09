@@ -21,8 +21,7 @@ class Sandbox(MQTTModule):
 
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
         payload_tags = payload["tags"]
-        first = payload_tags[0]
-        id = first["id"]
+        id = payload_tags["id"]
         # Flashes green, blue, green on AprilTag 0 (Total duration 0.75 seconds)
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
