@@ -1,4 +1,6 @@
 # Imports
+import time
+from threading import Thread
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrApriltagsRawPayload
 
@@ -21,16 +23,21 @@ class Sandbox(MQTTModule):
         if payload["tags"][0]["id"] == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
             print("Flashing green...")
+            time.sleep(0.25)
             self.flash_led([0, 0, 0, 255], 0.25)
             print("Flashing blue...")
+            time.sleep(0.25)
             self.flash_led([0, 0, 255, 0], 0.25)
             print("Flashing green...")
+            time.sleep(0.25)
         # Flashed red 3 times on AprilTag 4/5/6 (Total duration 0.75 seconds)
         if payload["tags"][0]["id"] == 4 or payload["tags"][0]["id"] == 5 or payload["tags"][0]["id"] == 6:
             for _ in range(3):
                 print("Flashing red...")
                 self.flash_led([255, 0, 0, 0], 0.125)
+                time.sleep(0.125)
                 self.flash_led([0, 0, 0, 0], 0.125)
+                time.sleep(0.125)
 
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
@@ -41,5 +48,10 @@ class Sandbox(MQTTModule):
 
 if __name__ == "__main__":
     box = Sandbox()
+    # Threading methods makes sure that time.sleep() doesn't make the whole code just stop running.
+    # Separates the method's timing system from the rest of the code.
+    apriltag_thread = Thread(target=box.handle_apriltag)
+    apriltag_thread.setDaemon(True)
+    apriltag_thread.start()
     # Run method lets sandbox listen for MQTT messages
     box.run()
