@@ -22,7 +22,6 @@ class Sandbox(MQTTModule):
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
         if payload is None or not payload["tags"]:
             return
-
         for tag in payload["tags"]:
             if tag is None or tag.id is None:
                 continue
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     box = Sandbox()
     # Threading methods makes sure that time.sleep() doesn't make the whole code just stop running.
     # Separates the method's timing system from the rest of the code.
-    apriltag_thread = Thread(target=box.handle_apriltag, args=(AvrApriltagsRawPayload,))
+    apriltag_thread = Thread(target=box.handle_apriltag)
     apriltag_thread.setDaemon(True)
     apriltag_thread.start()
     # Run method lets sandbox listen for MQTT messages
