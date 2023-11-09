@@ -20,20 +20,23 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
+        payload_tags = payload["tags"]
+        first = payload_tags[0]
+        id = first["id"]
         # Flashes green, blue, green on AprilTag 0 (Total duration 0.75 seconds)
-        if payload["tags"][0]["id"] == 0:
+        if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
             self.flash_event.wait(0.25)
             self.flash_led([0, 0, 0, 255], 0.25)
             self.flash_event.wait(0.25)
             self.flash_led([0, 0, 255, 0], 0.25)
         # Flashed red 3 times on AprilTag 4/5/6 (Total duration 0.75 seconds)
-        if payload["tags"][0]["id"] == 4 or payload["tags"][0]["id"] == 5 or payload["tags"][0]["id"] == 6:
+        if id == 4 or id == 5 or id == 6:
             for _ in range(3):
+                self.flash_event.wait(0.125)
                 self.flash_led([255, 0, 0, 0], 0.125)
                 self.flash_event.wait(0.125)
                 self.flash_led([0, 0, 0, 0], 0.125)
-                self.flash_event.wait(0.125)
 
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
