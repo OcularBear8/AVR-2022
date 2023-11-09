@@ -19,7 +19,8 @@ class Sandbox(MQTTModule):
         #                  listening for    |
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
-    def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
+    def handle_apriltag(self) -> None:
+        payload = AvrApriltagsRawPayload
         if payload is None or not payload["tags"]:
             return
         for tag in payload["tags"]:
