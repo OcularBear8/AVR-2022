@@ -20,10 +20,10 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
-        if payload is None or not payload.tags:
+        if payload is None or not payload["tags"]:
             return
 
-        for tag in payload.tags:
+        for tag in payload["tags"]:
             if tag is None or tag.id is None:
                 continue
         payload_tags = payload["tags"]
