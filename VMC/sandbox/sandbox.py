@@ -18,8 +18,7 @@ class Sandbox(MQTTModule):
         #                  listening for    |
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
-    def handle_apriltag(self) -> None:
-        payload = AvrApriltagsRawPayload
+    def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
         # Flashes green, blue, green on AprilTag 0 (Total duration 0.75 seconds)
         if payload["tags"][0]["id"] == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
@@ -49,6 +48,10 @@ class Sandbox(MQTTModule):
 
 if __name__ == "__main__":
     box = Sandbox()
-    
+    # Threading methods makes sure that time.sleep() doesn't make the whole code just stop running.
+    # Separates the method's timing system from the rest of the code.
+    apriltag_thread = Thread(target=box.handle_apriltag, args=(AvrApriltagsRawPayload,))
+    apriltag_thread.setDaemon(True)
+    apriltag_thread.start()
     # Run method lets sandbox listen for MQTT messages
     box.run()
