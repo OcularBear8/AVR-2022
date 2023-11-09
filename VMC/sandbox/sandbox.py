@@ -19,29 +19,25 @@ class Sandbox(MQTTModule):
         #                  listening for    |
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
-    def handle_apriltag(self) -> None:
+    def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
         payload = AvrApriltagsRawPayload
-        if payload is None or not payload["tags"]:
-            return
-        for tag in payload["tags"]:
-            if tag is None or tag.id is None:
-                continue
-        payload_tags = payload["tags"]
-        id = payload_tags["id"]
-        # Flashes green, blue, green on AprilTag 0 (Total duration 0.75 seconds)
+        try:
+            id = payload["tags"][0]["id"]
+        except Exception as e:
+            print(e)
+            id = -1
+        # Flashes green, blue, green on AprilTag 0 (Total duration 0.625 seconds)
         if id == 0:
-            self.flash_led([0, 0, 255, 0], 0.25)
-            self.flash_event.wait(0.25)
-            self.flash_led([0, 0, 0, 255], 0.25)
-            self.flash_event.wait(0.25)
-            self.flash_led([0, 0, 255, 0], 0.25)
+            self.flash_led([0, 0, 255, 0], 0.125)
+            self.flash_event.wait(0.125)
+            self.flash_led([0, 0, 0, 255], 0.125)
+            self.flash_event.wait(0.125)
+            self.flash_led([0, 0, 255, 0], 0.125)
         # Flashed red 3 times on AprilTag 4/5/6 (Total duration 0.75 seconds)
         if id == 4 or id == 5 or id == 6:
             for _ in range(3):
                 self.flash_event.wait(0.125)
                 self.flash_led([255, 0, 0, 0], 0.125)
-                self.flash_event.wait(0.125)
-                self.flash_led([0, 0, 0, 0], 0.125)
 
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
