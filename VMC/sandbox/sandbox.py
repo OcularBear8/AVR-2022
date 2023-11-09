@@ -20,11 +20,14 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
 
     def handle_apriltag(self, payload:AvrApriltagsRawPayload) -> None:
-        print("PAYLOAD", payload)
+        if payload is None or not payload.tags:
+            continue
+
+        for tag in payload.tags:
+            if tag is None or tag.id is None:
+                continue
         payload_tags = payload["tags"]
-        print(payload_tags)
         id = payload_tags["id"]
-        print(id)
         # Flashes green, blue, green on AprilTag 0 (Total duration 0.75 seconds)
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
