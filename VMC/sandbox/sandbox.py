@@ -17,7 +17,65 @@ class Sandbox(MQTTModule):
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
-        self.topic_map = {"avr/apriltags/raw": self.handle_apriltag}
+        self.topic_map = {"avr/apriltags/raw": self.handle_apriltag,
+                          "avr/go": self.recon_path}
+
+    def recon_path(self) -> None:
+        # fingers crossed
+        self.send_message(
+            "avr/fcm/capture_home",
+            {}
+        )
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "arm", "payload": {}}
+        )
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "takeoff", "payload": {}}
+        )
+        self.send_message(
+            "avr/fcm/actions",
+            {
+                "action": "goto_location_ned",
+                "payload": {
+                    "n": 0.0,
+                    "e": 0.0,
+                    "d": -3.7544,
+                    "heading": 359.99
+                }
+            }
+        self.send_message(
+            "avr/fcm/actions",
+            {
+                "action": "goto_location_ned",
+                "payload": {
+                    "n": 5.6896,
+                    "e": -1.778,
+                    "d": -3.7544,
+                    "heading": 359.99
+                }
+            }
+        )
+        self.send_message(
+            "avr/fcm/actions",
+            {
+                "action": "goto_location_ned",
+                "payload": {
+                    "n": 0.0,
+                    "e": 0.0,
+                    "d": -3.7544,
+                    "heading": 359.99
+                }
+            }
+        )
+        self.send_message(
+            "avr/fcm/actions",
+            {
+                "action": "land",
+                "payload": {}
+            }
+        )
 
     def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
         payload = AvrApriltagsRawPayload
