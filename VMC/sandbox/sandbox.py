@@ -29,6 +29,9 @@ class Sandbox(MQTTModule):
         takeoff = False
         up = False
         building = False
+        flash1 = False
+        flash2 = False
+        flash3 = False
         back = False
         down = False
         land = False
@@ -47,13 +50,13 @@ class Sandbox(MQTTModule):
                     {"action": "arm", "payload": {}}
                 )
                 armed = True
-            if not takeoff and time.time() - current_time > 1:
+            if not takeoff and time.time() - current_time > 1.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {"action": "takeoff", "payload": {}}
                 )
                 takeoff = True
-            if not up and time.time() - current_time > 2:
+            if not up and time.time() - current_time > 2.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {
@@ -67,7 +70,7 @@ class Sandbox(MQTTModule):
                     }
                 )
                 up = True
-            if not building and time.time() - current_time > 5:
+            if not building and time.time() - current_time > 5.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {
@@ -81,7 +84,17 @@ class Sandbox(MQTTModule):
                     }
                 )
                 building = True
-            if not back and time.time() - current_time > 15:
+            # flash
+            if not flash1 and time.time() - current_time > 12.0:
+                self.flash_led([0, 0, 255, 0], 0.125)
+                flash1 = True
+            if not flash2 and time.time() - current_time > 12.25:
+                self.flash_led([0, 0, 0, 255], 0.125)
+                flash2 = True
+            if not flash3 and time.time() - current_time > 12.5:
+                self.flash_led([0, 0, 255, 0], 0.125)
+                flash3 = True
+            if not back and time.time() - current_time > 15.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {
@@ -95,7 +108,7 @@ class Sandbox(MQTTModule):
                     }
                 )
                 back = True
-            if not down and time.time() - current_time > 22:
+            if not down and time.time() - current_time > 22.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {
@@ -109,7 +122,7 @@ class Sandbox(MQTTModule):
                     }
                 )
                 down = True
-            if not land and time.time() - current_time > 25:
+            if not land and time.time() - current_time > 25.0:
                 self.send_message(
                     "avr/fcm/actions",
                     {
