@@ -20,7 +20,45 @@ class Sandbox(MQTTModule):
         #                  code is          | when message is received
         #                  listening for    |
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag,
-                          "avr/go": self.recon_path}
+                          "avr/go": self.recon_path,
+                          "avr/test_recon": self.recon_test}
+
+    def recon_test(self, payload) -> None:
+        home_captured = False
+        armed = False
+        takeoff = False
+        land = False
+        path_completed = False
+        current_time = time.time()
+        while not path_completed:
+            if not home_captured:
+                self.send_message(
+                    "avr/fcm/capture_home",
+                    {}
+                )
+                home_captured = True
+            if not armed:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {"action": "arm", "payload": {}}
+                )
+                armed = True
+            if not takeoff and time.time() - current_time > 1.0:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {"action": "takeoff", "payload": {}}
+                )
+                takeoff = True
+            if not land and time.time() - current_time > 5.0:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "land",
+                        "payload": {}
+                    }
+                )
+                land = True
+                path_completed = True
 
     def recon_path(self, payload) -> None:
         # fingers crossed
@@ -135,6 +173,7 @@ class Sandbox(MQTTModule):
 
     def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
         # Flashes green, blue, green on AprilTag 0
+        id = payload["tags"][0]["id"]
         if id == 0:
             current_time = time.time()
             if not self.recon1:
