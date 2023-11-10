@@ -176,6 +176,7 @@ class Sandbox(MQTTModule):
         # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
         self.apriltag_list.append(id)
+        current_time = 9999999999999999999999999999999999999999999999
         if id == 0:
             if self.apriltag_list[-1] != self.apriltag_list[-2]:
                 current_time = time.time()
