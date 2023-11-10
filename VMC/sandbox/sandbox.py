@@ -177,9 +177,8 @@ class Sandbox(MQTTModule):
         id = payload["tags"][0]["id"]
         self.apriltag_list.append(id)
         if id == 0:
-            try:
-                if self.apriltag_list[-1] != self.apriltag_list[-2]:
-                    current_time = time.time()
+            if self.apriltag_list[-1] != self.apriltag_list[-2]:
+                current_time = time.time()
             if not self.recon1:
                 self.flash_led([0, 0, 255, 0], 0.25)
                 self.recon1 = True
@@ -192,9 +191,8 @@ class Sandbox(MQTTModule):
                 self.recon2 = False
         # Flashed red 3 times on AprilTag 4/5/6
         if id == 4 or id == 5 or id == 6:
-            try:
-                if self.apriltag_list[-1] != self.apriltag_list[-2]:
-                    current_time = time.time()
+            if self.apriltag_list[-1] != self.apriltag_list[-2]:
+                current_time = time.time()
             if not self.hotspot1:
                 self.flash_led([0, 255, 0, 0], 0.125)
                 self.hotspot1 = True
