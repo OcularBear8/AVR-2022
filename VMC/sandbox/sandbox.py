@@ -46,7 +46,7 @@ class Sandbox(MQTTModule):
             if not takeoff and time.time() - current_time > 1.0:
                 self.send_message(
                     "avr/fcm/actions",
-                    {"action": "takeoff", "payload": {}}
+                    {"action": "takeoff", "payload": {"alt": 0.5}}
                 )
                 takeoff = True
             if not land and time.time() - current_time > 5.0:
@@ -82,7 +82,7 @@ class Sandbox(MQTTModule):
                     {}
                 )
                 home_captured = True
-            if not armed:
+            if not armed and time.time() - current_time > 0.01:
                 self.send_message(
                     "avr/fcm/actions",
                     {"action": "arm", "payload": {}}
@@ -91,7 +91,7 @@ class Sandbox(MQTTModule):
             if not takeoff and time.time() - current_time > 1.0:
                 self.send_message(
                     "avr/fcm/actions",
-                    {"action": "takeoff", "payload": {}}
+                    {"action": "takeoff", "payload": {"alt": 0.5}}
                 )
                 takeoff = True
             if not up and time.time() - current_time > 2.0:
