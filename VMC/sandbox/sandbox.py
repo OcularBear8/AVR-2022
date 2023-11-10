@@ -16,6 +16,7 @@ class Sandbox(MQTTModule):
         self.recon2 = False
         self.hotspot1 = False
         self.hotspot2 = False
+        self.apriltag_list = [-1]
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
@@ -174,8 +175,11 @@ class Sandbox(MQTTModule):
     def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
         # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
+        self.apriltag_list.append(id)
         if id == 0:
-            current_time = time.time()
+            try:
+                if self.apriltag_list[-1] != self.apriltag_list[-2]:
+                    current_time = time.time()
             if not self.recon1:
                 self.flash_led([0, 0, 255, 0], 0.25)
                 self.recon1 = True
@@ -188,7 +192,9 @@ class Sandbox(MQTTModule):
                 self.recon2 = False
         # Flashed red 3 times on AprilTag 4/5/6
         if id == 4 or id == 5 or id == 6:
-            current_time = time.time()
+            try:
+                if self.apriltag_list[-1] != self.apriltag_list[-2]:
+                    current_time = time.time()
             if not self.hotspot1:
                 self.flash_led([0, 255, 0, 0], 0.125)
                 self.hotspot1 = True
