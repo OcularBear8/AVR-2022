@@ -49,6 +49,7 @@ class Sandbox(MQTTModule):
                     "heading": 359.99
                 }
             }
+        )
         self.send_message(
             "avr/fcm/actions",
             {
