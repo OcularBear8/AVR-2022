@@ -24,63 +24,103 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/raw": self.handle_apriltag,
                           "avr/go": self.recon_path}
 
-    def recon_path(self) -> None:
+    def recon_path(self, payload) -> None:
         # fingers crossed
-        self.send_message(
-            "avr/fcm/capture_home",
-            {}
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {"action": "arm", "payload": {}}
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {"action": "takeoff", "payload": {}}
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {
-                "action": "goto_location_ned",
-                "payload": {
-                    "n": 0.0,
-                    "e": 0.0,
-                    "d": -3.7544,
-                    "heading": 359.99
-                }
-            }
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {
-                "action": "goto_location_ned",
-                "payload": {
-                    "n": 5.6896,
-                    "e": -1.778,
-                    "d": -3.7544,
-                    "heading": 359.99
-                }
-            }
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {
-                "action": "goto_location_ned",
-                "payload": {
-                    "n": 0.0,
-                    "e": 0.0,
-                    "d": -3.7544,
-                    "heading": 359.99
-                }
-            }
-        )
-        self.send_message(
-            "avr/fcm/actions",
-            {
-                "action": "land",
-                "payload": {}
-            }
-        )
+        home_captured = False
+        armed = False
+        takeoff = False
+        up = False
+        building = False
+        back = False
+        down = False
+        land = False
+        path_completed = False
+        current_time = time.time()
+        while not path_completed:
+            if not home_captured:
+                self.send_message(
+                    "avr/fcm/capture_home",
+                    {}
+                )
+                home_captured = True
+            if not armed:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {"action": "arm", "payload": {}}
+                )
+                armed = True
+            if not takeoff and time.time() - current_time > 1:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {"action": "takeoff", "payload": {}}
+                )
+                takeoff = True
+            if not up and time.time() - current_time > 2:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "goto_location_ned",
+                        "payload": {
+                            "n": 0.0,
+                            "e": 0.0,
+                            "d": -3.7544,
+                            "heading": 359.99
+                        }
+                    }
+                )
+                up = True
+            if not building and time.time() - current_time > 5:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "goto_location_ned",
+                        "payload": {
+                            "n": 5.6896,
+                            "e": -1.778,
+                            "d": -3.7544,
+                            "heading": 180.00
+                        }
+                    }
+                )
+                building = True
+            if not back and time.time() - current_time > 15:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "goto_location_ned",
+                        "payload": {
+                            "n": 0.0,
+                            "e": 0.0,
+                            "d": -3.7544,
+                            "heading": 359.99
+                        }
+                    }
+                )
+                back = True
+            if not down and time.time() - current_time > 22:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "goto_location_ned",
+                        "payload": {
+                            "n": 0.0,
+                            "e": 0.0,
+                            "d": -1,
+                            "heading": 359.99
+                        }
+                    }
+                )
+                down = True
+            if not land and time.time() - current_time > 25:
+                self.send_message(
+                    "avr/fcm/actions",
+                    {
+                        "action": "land",
+                        "payload": {}
+                    }
+                )
+                land = True
+                path_completed = True
 
     def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
         # Flashes green, blue, green on AprilTag 0 (Total duration 0.625 seconds)
