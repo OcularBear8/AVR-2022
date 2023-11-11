@@ -12,11 +12,6 @@ from loguru import logger
 class Sandbox(MQTTModule):
     def __init__(self) -> None:
         super().__init__()
-        self.recon1 = False
-        self.recon2 = False
-        self.hotspot1 = False
-        self.hotspot2 = False
-        self.apriltag_list = [-1]
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
