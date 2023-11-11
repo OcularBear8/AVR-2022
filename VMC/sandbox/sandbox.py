@@ -1,7 +1,7 @@
 # Imports
 import time
 from bell.avr.mqtt.client import MQTTModule
-from bell.avr.mqtt.payloads import AvrApriltagsRawPayload
+from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
 
 # Loguru is good for logging.
 # https://loguru.readthedocs.io/en/stable/
@@ -20,7 +20,7 @@ class Sandbox(MQTTModule):
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
-        self.topic_map = {"avr/apriltags/raw": self.handle_apriltag,
+        self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
                           "avr/go": self.recon_path,
                           "avr/test_recon": self.recon_test}
 
@@ -172,12 +172,16 @@ class Sandbox(MQTTModule):
                 land = True
                 path_completed = True
 
-    def handle_apriltag(self, payload: AvrApriltagsRawPayload) -> None:
+    def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
         # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
-        self.apriltag_list.append(id)
-        current_time = 9999999999999999999999999999999999999999999999
         if id == 0:
+            for _ in range(3):
+                current_time = time.time()
+                while time.time() - current_time < 0.125:
+                    pass
+                self.flash_led([0, 0, 255, 0], 0.125)
+            """
             if self.apriltag_list[-1] != self.apriltag_list[-2]:
                 current_time = time.time()
             if not self.recon1:
@@ -190,8 +194,15 @@ class Sandbox(MQTTModule):
                 self.flash_led([0, 0, 255, 0], 0.25)
                 self.recon1 = False
                 self.recon2 = False
-        # Flashed red 3 times on AprilTag 4/5/6
+            """
+        # Flashes red 3 times on AprilTag 4/5/6
         if id == 4 or id == 5 or id == 6:
+            for _ in range(3):
+                current_time = time.time()
+                while time.time() - current_time < 0.125:
+                    pass
+                self.flash_led([0, 255, 0, 0], 0.125)
+            """
             if self.apriltag_list[-1] != self.apriltag_list[-2]:
                 current_time = time.time()
             if not self.hotspot1:
@@ -204,6 +215,7 @@ class Sandbox(MQTTModule):
                 self.flash_led([0, 255, 0, 0], 0.125)
                 self.hotspot1 = False
                 self.hotspot2 = False
+            """
 
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
