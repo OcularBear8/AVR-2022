@@ -171,11 +171,18 @@ class Sandbox(MQTTModule):
         # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
         if id == 0:
-            for _ in range(3):
-                current_time = time.time()
-                while time.time() - current_time < 0.125:
-                    pass
-                self.flash_led([0, 0, 255, 0], 0.125)
+            current_time = time.time()
+            while time.time() - current_time < 0.25:
+                pass
+            self.flash_led([0, 0, 255, 0], 0.25)
+            current_time = time.time()
+            while time.time() - current_time < 0.25:
+                pass
+            self.flash_led([0, 255, 0, 0], 0.25)
+            current_time = time.time()
+            while time.time() - current_time < 0.25:
+                pass
+            self.flash_led([0, 0, 255, 0], 0.25)
             """
             if self.apriltag_list[-1] != self.apriltag_list[-2]:
                 current_time = time.time()
@@ -194,7 +201,7 @@ class Sandbox(MQTTModule):
         if id == 4 or id == 5 or id == 6:
             for _ in range(3):
                 current_time = time.time()
-                while time.time() - current_time < 0.125:
+                while time.time() - current_time < 0.25:
                     pass
                 self.flash_led([0, 255, 0, 0], 0.125)
             """
