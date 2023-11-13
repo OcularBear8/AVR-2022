@@ -197,6 +197,13 @@ class Sandbox(MQTTModule):
                 self.recon1 = False
                 self.recon2 = False
             """
+        # Autonomous water drop
+        if id == 1 or id == 2 or id == 3:
+            for _ in range(3):
+                current_time = time.time()
+                while time.time() - current_time < 0.25:
+                    pass
+                self.flash_led([0, 0, 255, 255], 0.125)
         # Flashes red 3 times on AprilTag 4/5/6
         if id == 4 or id == 5 or id == 6:
             for _ in range(3):
