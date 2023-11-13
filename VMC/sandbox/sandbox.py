@@ -171,60 +171,13 @@ class Sandbox(MQTTModule):
         # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
         if id == 0:
-            current_time = time.time()
-            while time.time() - current_time < 0.25:
-                pass
             self.flash_led([0, 0, 255, 0], 0.25)
-            current_time = time.time()
-            while time.time() - current_time < 0.25:
-                pass
-            self.flash_led([0, 255, 0, 0], 0.25)
-            current_time = time.time()
-            while time.time() - current_time < 0.25:
-                pass
-            self.flash_led([0, 0, 255, 0], 0.25)
-            """
-            if self.apriltag_list[-1] != self.apriltag_list[-2]:
-                current_time = time.time()
-            if not self.recon1:
-                self.flash_led([0, 0, 255, 0], 0.25)
-                self.recon1 = True
-            if time.time() - current_time > 0.25 and not self.recon2:
-                self.flash_led([0, 0, 0, 255], 0.25)
-                self.recon2 = True
-            if time.time() - current_time > 0.5:
-                self.flash_led([0, 0, 255, 0], 0.25)
-                self.recon1 = False
-                self.recon2 = False
-            """
         # Autonomous water drop
         if id == 1 or id == 2 or id == 3:
-            for _ in range(3):
-                current_time = time.time()
-                while time.time() - current_time < 0.25:
-                    pass
-                self.flash_led([0, 0, 255, 255], 0.125)
+            self.flash_led([0, 0, 255, 255], 0.25)
         # Flashes red 3 times on AprilTag 4/5/6
         if id == 4 or id == 5 or id == 6:
-            for _ in range(3):
-                current_time = time.time()
-                while time.time() - current_time < 0.25:
-                    pass
-                self.flash_led([0, 255, 0, 0], 0.125)
-            """
-            if self.apriltag_list[-1] != self.apriltag_list[-2]:
-                current_time = time.time()
-            if not self.hotspot1:
-                self.flash_led([0, 255, 0, 0], 0.125)
-                self.hotspot1 = True
-            if time.time() - current_time > 0.25 and not self.hotspot2:
-                self.flash_led([0, 255, 0, 0], 0.125)
-                self.hotspot2 = True
-            if time.time() - current_time > 0.5:
-                self.flash_led([0, 255, 0, 0], 0.125)
-                self.hotspot1 = False
-                self.hotspot2 = False
-            """
+            self.flash_led([0, 255, 0, 0], 0.25)
 
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
