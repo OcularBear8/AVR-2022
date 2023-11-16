@@ -176,10 +176,6 @@ class Sandbox(MQTTModule):
         id = payload["tags"][0]["id"]
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
-            time.sleep(0.25)
-            self.flash_led([0, 0, 0, 255], 0.25)
-            time.sleep(0.25)
-            self.flash_led([0, 0, 255, 0], 0.25)
         # Autonomous water drop
         if id == 1 or id == 2 or id == 3:
             self.flash_led([0, 0, 255, 255], 0.25)
