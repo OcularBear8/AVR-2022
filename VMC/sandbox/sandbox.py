@@ -17,11 +17,7 @@ class Sandbox(MQTTModule):
         #                  listening for    |
         self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
                           "avr/go": self.recon_path,
-                          "avr/test_recon": self.recon_test,
-                          "avr/yes": self.trigger}
-
-    def trigger(self, payload) -> None:
-        self.flash_led([0, 255, 255, 255], 0.5)
+                          "avr/test_recon": self.recon_test}
 
     def recon_test(self, payload) -> None:
         home_captured = False
@@ -172,14 +168,14 @@ class Sandbox(MQTTModule):
                 path_completed = True
 
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
-        # Flashes green, blue, green on AprilTag 0
         id = payload["tags"][0]["id"]
+        # Flashes green on 0
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
-        # Autonomous water drop
+        # Flashes cyan on 1/2/3
         if id == 1 or id == 2 or id == 3:
             self.flash_led([0, 0, 255, 255], 0.25)
-        # Flashes red 3 times on AprilTag 4/5/6
+        # Flashes red on 4/5/6
         if id == 4 or id == 5 or id == 6:
             self.flash_led([0, 255, 0, 0], 0.25)
 
@@ -192,6 +188,5 @@ class Sandbox(MQTTModule):
 
 if __name__ == "__main__":
     box = Sandbox()
-    box.run_non_blocking()
     # Run method lets sandbox listen for MQTT messages
     box.run()
