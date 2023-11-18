@@ -18,6 +18,7 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
                           "avr/go": self.recon_path,
                           "avr/test_recon": self.recon_test}
+        self.waterdrop = True
 
     def recon_test(self, payload) -> None:
         home_captured = False
@@ -172,9 +173,35 @@ class Sandbox(MQTTModule):
         # Flashes green on 0
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
-        # Flashes cyan on 1/2/3
+        # Water drop on 1/2/3
         if id == 1 or id == 2 or id == 3:
             self.flash_led([0, 0, 255, 255], 0.25)
+            if self.waterdrop:
+                self.waterdrop = False
+                self.send_message(
+                    "avr/pcm/set_servo_open_close",
+                    {"servo": 0,
+                     "action": "open"}
+                )
+                time.sleep(0.05)
+                self.send_message(
+                    "avr/pcm/set_servo_open_close",
+                    {"servo": 1,
+                     "action": "open"}
+                )
+                time.sleep(1.5)
+                self.send_message(
+                    "avr/pcm/set_servo_open_close",
+                    {"servo": 0,
+                     "action": "close"}
+                )
+                time.sleep(0.05)
+                self.send_message(
+                    "avr/pcm/set_servo_open_close",
+                    {"servo": 1,
+                     "action": "close"}
+                )
+                self.waterdrop = True
         # Flashes red on 4/5/6
         if id == 4 or id == 5 or id == 6:
             self.flash_led([0, 255, 0, 0], 0.25)
