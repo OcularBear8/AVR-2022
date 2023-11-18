@@ -19,6 +19,9 @@ class Sandbox(MQTTModule):
                           "avr/go": self.recon_path,
                           "avr/test_recon": self.recon_test}
         self.waterdrop = True
+        # Initializes variables for time control
+        self.last_recon_flash_time = 0
+        self.last_servo_move = 0
 
     def recon_test(self, payload) -> None:
         home_captured = False
@@ -170,40 +173,20 @@ class Sandbox(MQTTModule):
 
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
         id = payload["tags"][0]["id"]
+        current_time = time.time()
         # Flashes green on 0
-        if id == 0:
+        if id == 0 and current_time - self.last_recon_flash_time > 15:
+            self.flash_led([0, 0, 255, 0], 0.25)
+            time.sleep(0.25)
+            self.flash_led([0, 0, 0, 255], 0.25)
+            time.sleep(0.25)
             self.flash_led([0, 0, 255, 0], 0.25)
         # Water drop on 1/2/3
-        if id == 1 or id == 2 or id == 3:
+        if id in [1, 2, 3] and current_time - self.last_servo_move > 10:
             self.flash_led([0, 0, 255, 255], 0.25)
-            if self.waterdrop:
-                self.waterdrop = False
-                self.send_message(
-                    "avr/pcm/set_servo_open_close",
-                    {"servo": 0,
-                     "action": "open"}
-                )
-                time.sleep(0.05)
-                self.send_message(
-                    "avr/pcm/set_servo_open_close",
-                    {"servo": 1,
-                     "action": "open"}
-                )
-                time.sleep(1.5)
-                self.send_message(
-                    "avr/pcm/set_servo_open_close",
-                    {"servo": 0,
-                     "action": "close"}
-                )
-                time.sleep(0.05)
-                self.send_message(
-                    "avr/pcm/set_servo_open_close",
-                    {"servo": 1,
-                     "action": "close"}
-                )
-                self.waterdrop = True
+            self.drop_water()
         # Flashes red on 4/5/6
-        if id == 4 or id == 5 or id == 6:
+        if id in [4, 5, 6]:
             self.flash_led([0, 255, 0, 0], 0.25)
 
     def flash_led(self, color: list, duration: float) -> None:
@@ -211,6 +194,31 @@ class Sandbox(MQTTModule):
         self.send_message(
             "avr/pcm/set_temp_color",
             {"wrgb": color, "duration": duration}
+        )
+
+    def drop_water(self) -> None:
+        self.send_message(
+            "avr/pcm/set_servo_open_close",
+            {"servo": 0,
+             "action": "open"}
+        )
+        time.sleep(0.05)
+        self.send_message(
+            "avr/pcm/set_servo_open_close",
+            {"servo": 1,
+             "action": "open"}
+        )
+        time.sleep(1.5)
+        self.send_message(
+            "avr/pcm/set_servo_open_close",
+            {"servo": 0,
+             "action": "close"}
+        )
+        time.sleep(0.05)
+        self.send_message(
+            "avr/pcm/set_servo_open_close",
+            {"servo": 1,
+             "action": "close"}
         )
 
 if __name__ == "__main__":
