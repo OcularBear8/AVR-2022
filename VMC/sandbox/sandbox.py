@@ -18,14 +18,12 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
                           "avr/go": self.recon_path,
                           "avr/test_recon": self.recon_test}
-        self.waterdrop = True
         # Initializes variables for time control
         self.last_recon_flash_time = 0
         self.last_servo_move = 0
 
     def recon_test(self, payload) -> None:
         home_captured = False
-        armed = False
         takeoff = False
         land = False
         path_completed = False
@@ -37,12 +35,6 @@ class Sandbox(MQTTModule):
                     {}
                 )
                 home_captured = True
-            if not armed:
-                self.send_message(
-                    "avr/fcm/actions",
-                    {"action": "arm", "payload": {}}
-                )
-                armed = True
             if not takeoff and time.time() - current_time > 1.0:
                 self.send_message(
                     "avr/fcm/actions",
@@ -63,13 +55,9 @@ class Sandbox(MQTTModule):
     def recon_path(self, payload) -> None:
         # fingers crossed
         home_captured = False
-        armed = False
         takeoff = False
         up = False
         building = False
-        flash1 = False
-        flash2 = False
-        flash3 = False
         back = False
         down = False
         land = False
@@ -82,12 +70,6 @@ class Sandbox(MQTTModule):
                     {}
                 )
                 home_captured = True
-            if not armed and time.time() - current_time > 0.01:
-                self.send_message(
-                    "avr/fcm/actions",
-                    {"action": "arm", "payload": {}}
-                )
-                armed = True
             if not takeoff and time.time() - current_time > 1.0:
                 self.send_message(
                     "avr/fcm/actions",
@@ -122,16 +104,6 @@ class Sandbox(MQTTModule):
                     }
                 )
                 building = True
-            # flash
-            if not flash1 and time.time() - current_time > 12.0:
-                self.flash_led([0, 0, 255, 0], 0.125)
-                flash1 = True
-            if not flash2 and time.time() - current_time > 12.25:
-                self.flash_led([0, 0, 0, 255], 0.125)
-                flash2 = True
-            if not flash3 and time.time() - current_time > 12.5:
-                self.flash_led([0, 0, 255, 0], 0.125)
-                flash3 = True
             if not back and time.time() - current_time > 15.0:
                 self.send_message(
                     "avr/fcm/actions",
