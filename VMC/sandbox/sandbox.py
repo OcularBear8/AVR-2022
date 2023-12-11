@@ -15,7 +15,8 @@ class Sandbox(MQTTModule):
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
-        self.topic_map = {"avr/apriltags/visible": self.handle_apriltag}
+        self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
+                          "avr/test_led": self.test_led}
 
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
         id = payload["tags"][0]["id"]
@@ -29,12 +30,27 @@ class Sandbox(MQTTModule):
         if id == 4 or id == 5 or id == 6:
             self.flash_led([0, 255, 0, 0], 0.25)
 
+    def test_led(self, payload) -> None:
+        color_list = [
+            [0, 255, 0, 0],
+            [0, 0, 255, 0],
+            [0, 0, 0, 255],
+            [0, 255, 255, 0],
+            [0, 0, 255, 255],
+            [0, 255, 0, 255],
+            [0, 255, 255, 255]
+        ]
+        for i in range(7):
+            self.flash_led(color_list[i], 0.25)
+            time.sleep(1)
+    
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
         self.send_message(
             "avr/pcm/set_temp_color",
             {"wrgb": color, "duration": duration}
         )
+
 
 if __name__ == "__main__":
     box = Sandbox()
