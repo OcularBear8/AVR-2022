@@ -41,8 +41,10 @@ class Sandbox(MQTTModule):
             [0, 255, 255, 255]
         ]
         for i in range(7):
+            start = time.time()
+            while time.time() - start < 0.5:
+                pass
             self.flash_led(color_list[i], 0.25)
-            time.sleep(1)
     
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
