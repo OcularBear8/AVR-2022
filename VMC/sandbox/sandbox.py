@@ -44,7 +44,10 @@ class Sandbox(MQTTModule):
             start = time.time()
             while time.time() - start < 0.5:
                 pass
-            self.flash_led(color_list[i], 0.25)
+            self.send_message(
+                "avr/pcm/set_temp_color",
+                {"wrgb": color_list[i], "duration": 0.25}
+            )
     
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
