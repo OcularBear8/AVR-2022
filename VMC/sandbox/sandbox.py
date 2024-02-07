@@ -3,10 +3,6 @@ import time
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
 
-# Loguru is good for logging.
-# https://loguru.readthedocs.io/en/stable/
-from loguru import logger
-
 
 # Sandbox class
 class Sandbox(MQTTModule):
