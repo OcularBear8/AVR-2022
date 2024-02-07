@@ -16,7 +16,8 @@ class Sandbox(MQTTModule):
         #                  code is          | when message is received
         #                  listening for    |
         self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
-                          "avr/test_led": self.test_led}
+                          "avr/test_led": self.test_led,
+                          "avr/test_flight": self.test_flight}
 
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
         id = payload["tags"][0]["id"]
@@ -56,6 +57,27 @@ class Sandbox(MQTTModule):
             {"wrgb": color, "duration": duration}
         )
 
+    def test_flight(self, payload) -> None:
+        # Takes off, waits, lands
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "arm", "payload": {}}
+        )
+        time.sleep(2)
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "takeoff", "payload": {"alt": 0.5}}
+        )
+        time.sleep(5)
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "land", "payload": {}}
+        )
+        time.sleep(2)
+        self.send_message(
+            "avr/fcm/actions",
+            {"action": "disarm", "payload": {}}
+        )
 
 if __name__ == "__main__":
     box = Sandbox()
