@@ -3,6 +3,8 @@ import time
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
 
+from bell.avr.mqtt.payloads import AvrPcmSetServoOpenClosePayload
+
 
 # Sandbox class
 class Sandbox(MQTTModule):
@@ -74,6 +76,31 @@ class Sandbox(MQTTModule):
             "avr/fcm/actions",
             {"action": "disarm", "payload": {}}
         )
+        
+    ##--opens a servo, waits, and closes it--##              
+    def servo_drop(self, servo: int, movment_a: str, movment_b: str) -> None:
+        ##opens
+        payload = AvrPcmSetServoOpenClosePayload(servo= servo, action= movment_a)
+        self.send_message("avr/pcm/set_servo_open_close", payload)
+        ##instead of waiting I will flash
+        self.flash_led([0, 255, 170, 255], 0.50)
+        if servo == 2:
+            self.flash_led([0, 0, 0, 255], 0.50)
+        else:
+            self.flash_led([0, 255, 0, 0], 0.50)
+        self.flash_led([0, 255, 170, 255], 0.50)
+        ##closes
+        payload = AvrPcmSetServoOpenClosePayload(servo= servo, action= movment_b)
+        self.send_message("avr/pcm/set_servo_open_close", payload)
+
+    ##--figures out what servo and movement is nesisary--##
+    ##!!! place holder for now!! do not use in this state 25% chance corect##
+    def activate_correct_servo(self, id = int)
+        if id == 6 or id == 4:
+            servo_drop(self, 4, "open", "close")
+        elif id == 5:
+            servo_drop(self, 3, "close", "open")
+        
 
 if __name__ == "__main__":
     box = Sandbox()
