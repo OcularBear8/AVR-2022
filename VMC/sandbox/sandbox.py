@@ -28,6 +28,7 @@ class Sandbox(MQTTModule):
         # Flashes red on 4/5/6
         if id == 4 or id == 5 or id == 6:
             self.flash_led([0, 255, 0, 0], 0.25)
+            self.activate_correct_servo(id)
 
     def test_led(self, payload) -> None:
         color_list = [
@@ -93,8 +94,7 @@ class Sandbox(MQTTModule):
         payload = AvrPcmSetServoOpenClosePayload(servo= servo, action= movment_b)
         self.send_message("avr/pcm/set_servo_open_close", payload)
 
-    ##--figures out what servo and movement is nesisary--##
-    ##!!! place holder for now!! do not use in this state 25% chance corect##
+    ##--figures out what servo and movement is necessary--##
     def activate_correct_servo(self, id = int)
         if id == 6 or id == 4:
             servo_drop(self, 2, "open", "close")
