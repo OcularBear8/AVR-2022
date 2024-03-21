@@ -97,9 +97,9 @@ class Sandbox(MQTTModule):
     ##!!! place holder for now!! do not use in this state 25% chance corect##
     def activate_correct_servo(self, id = int)
         if id == 6 or id == 4:
-            servo_drop(self, 4, "open", "close")
+            servo_drop(self, 2, "open", "close")
         elif id == 5:
-            servo_drop(self, 3, "close", "open")
+            servo_drop(self, 1, "open", "close")
         
 
 if __name__ == "__main__":
