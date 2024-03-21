@@ -2,7 +2,6 @@
 import time
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
-
 from bell.avr.mqtt.payloads import AvrPcmSetServoOpenClosePayload
 
 
@@ -79,9 +78,9 @@ class Sandbox(MQTTModule):
         )
         
     ##--opens a servo, waits, and closes it--##              
-    def servo_drop(self, servo: int, movment_a: str, movment_b: str) -> None:
+    def servo_drop(self, servo: int, movement_a: str, movement_b: str) -> None:
         ##opens
-        payload = AvrPcmSetServoOpenClosePayload(servo= servo, action= movment_a)
+        payload = AvrPcmSetServoOpenClosePayload(servo = servo, action = movement_a)
         self.send_message("avr/pcm/set_servo_open_close", payload)
         ##instead of waiting I will flash
         self.flash_led([0, 255, 170, 255], 0.50)
@@ -91,11 +90,11 @@ class Sandbox(MQTTModule):
             self.flash_led([0, 255, 0, 0], 0.50)
         self.flash_led([0, 255, 170, 255], 0.50)
         ##closes
-        payload = AvrPcmSetServoOpenClosePayload(servo= servo, action= movment_b)
+        payload = AvrPcmSetServoOpenClosePayload(servo = servo, action = movement_b)
         self.send_message("avr/pcm/set_servo_open_close", payload)
 
     ##--figures out what servo and movement is necessary--##
-    def activate_correct_servo(self, id = int)
+    def activate_correct_servo(self, id: int):
         if id == 6 or id == 4:
             servo_drop(self, 2, "open", "close")
         elif id == 5:
@@ -106,3 +105,4 @@ if __name__ == "__main__":
     box = Sandbox()
     # Run method lets sandbox listen for MQTT messages
     box.run()
+    
