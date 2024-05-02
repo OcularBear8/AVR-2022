@@ -12,22 +12,41 @@ class Sandbox(MQTTModule):
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
-        self.topic_map = {"avr/apriltags/visible": self.handle_apriltag,
+        self.topic_map = {"avr/apriltags/fps": self.handle_apriltag,
+                          "avr/apriltags/visible": self.handle_apriltag,
                           "avr/test_led": self.test_led,
                           "avr/test_flight": self.test_flight}
 
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
-        id = payload["tags"][0]["id"]
+        try:
+            id = payload["tags"][0]["id"]
+        except:
+            self.send_message(
+                "avr/pcm/set_servo_open_close",
+                AvrPcmSetServoOpenClosePayload(servo = 1, action = "close")
+            )
+            self.send_message(
+                "avr/pcm/set_servo_open_close",
+                AvrPcmSetServoOpenClosePayload(servo = 2, action = "close")
+            )
         # Flashes green on 0
         if id == 0:
             self.flash_led([0, 0, 255, 0], 0.25)
         # Flashes cyan on 1/2/3
         if id == 1 or id == 2 or id == 3:
             self.flash_led([0, 0, 255, 255], 0.25)
+            self.send_message(
+                "avr/pcm/set_servo_open_close",
+                AvrPcmSetServoOpenClosePayload(servo = 1, action = "open")
+            )
+            self.send_message(
+                "avr/pcm/set_servo_open_close",
+                AvrPcmSetServoOpenClosePayload(servo = 2, action = "open")
+            )
         # Flashes red on 4/5/6
         if id == 4 or id == 5 or id == 6:
             self.flash_led([0, 255, 0, 0], 0.25)
-            self.activate_correct_servo(id)
+            #self.activate_correct_servo(id)
 
     def test_led(self, payload) -> None:
         color_list = [
@@ -94,11 +113,13 @@ class Sandbox(MQTTModule):
         self.send_message("avr/pcm/set_servo_open_close", payload)
 
     ##--figures out what servo and movement is necessary--##
+    """
     def activate_correct_servo(self, id: int):
         if id == 6 or id == 4:
             servo_drop(self, 2, "open", "close")
         elif id == 5:
             servo_drop(self, 1, "open", "close")
+    """
         
 
 if __name__ == "__main__":
