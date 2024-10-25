@@ -1,8 +1,9 @@
 # Imports
-import time
+import time, base64, json
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
 from bell.avr.mqtt.payloads import AvrPcmSetServoOpenClosePayload
+from bell.avr.mqtt.payloads import AvrThermalReadingPayload
 
 
 # Sandbox class
@@ -15,8 +16,11 @@ class Sandbox(MQTTModule):
         self.topic_map = {"avr/apriltags/fps": self.handle_apriltag,
                           "avr/apriltags/visible": self.handle_apriltag,
                           "avr/test_led": self.test_led,
-                          "avr/test_flight": self.test_flight}
+                          "avr/test_flight": self.test_flight,
+                          "avr/thermal/reading": self.thermal_flash}
 
+    # AVR 2023 code
+    """
     def handle_apriltag(self, payload: AvrApriltagsVisiblePayload) -> None:
         try:
             id = payload["tags"][0]["id"]
@@ -66,14 +70,14 @@ class Sandbox(MQTTModule):
                 "avr/pcm/set_temp_color",
                 {"wrgb": color_list[i], "duration": 0.25}
             )
-    
+    """
     def flash_led(self, color: list, duration: float) -> None:
         # Colors LED temporarily
         self.send_message(
             "avr/pcm/set_temp_color",
             {"wrgb": color, "duration": duration}
         )
-
+    """
     def test_flight(self, payload) -> None:
         # Takes off, waits, lands
         self.send_message(
@@ -111,6 +115,7 @@ class Sandbox(MQTTModule):
         ##closes
         payload = AvrPcmSetServoOpenClosePayload(servo = servo, action = movement_b)
         self.send_message("avr/pcm/set_servo_open_close", payload)
+    """
 
     ##--figures out what servo and movement is necessary--##
     """
@@ -120,6 +125,16 @@ class Sandbox(MQTTModule):
         elif id == 5:
             servo_drop(self, 1, "open", "close")
     """
+
+    # AVR 2024 code
+    def thermal_flash(self, payload: AvrThermalReadingPayload) -> None:
+        data = json.loads(payload)["data"]
+        base64_decoded = data.encode("utf-8")
+        as_bytes = base64.b64decode(base64_decoded)
+        pixel_ints = list(bytearray(as_bytes))
+        if max(pixel_ints) >= 35:
+            #flash led
+            self.flash_led([0, 255, 255, 255], .5)
         
 
 if __name__ == "__main__":
