@@ -13,11 +13,7 @@ class Sandbox(MQTTModule):
         #                  message that the | method that runs
         #                  code is          | when message is received
         #                  listening for    |
-        self.topic_map = {"avr/apriltags/fps": self.handle_apriltag,
-                          "avr/apriltags/visible": self.handle_apriltag,
-                          "avr/test_led": self.test_led,
-                          "avr/test_flight": self.test_flight,
-                          "avr/thermal/reading": self.thermal_flash}
+        self.topic_map = {"avr/thermal/reading": self.thermal_flash}
 
     # AVR 2023 code
     """
