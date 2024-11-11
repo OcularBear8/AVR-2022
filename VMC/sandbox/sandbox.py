@@ -134,9 +134,7 @@ class Sandbox(MQTTModule):
         pixel_ints = list(bytearray(as_bytes))
         if max(pixel_ints) >= 35:
             #flash led
-            self.flash_led([0, 255, 255, 255], .5)
-        else:
-            self.flash_led([0, 0, 255, 255], .5)
+            self.flash_led([0, 255, 255, 255], 0.5)
         
 
 if __name__ == "__main__":
