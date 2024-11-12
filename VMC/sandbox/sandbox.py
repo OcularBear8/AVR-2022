@@ -124,7 +124,8 @@ class Sandbox(MQTTModule):
 
     # AVR 2024 code
     def thermal_flash(self, payload: AvrThermalReadingPayload) -> None:
-        data = json.loads(payload)["data"]
+        data_str = str(payload["data"])
+        data = json.loads(data_str)
         base64_decoded = data.encode("utf-8")
         as_bytes = base64.b64decode(base64_decoded)
         pixel_ints = list(bytearray(as_bytes))
